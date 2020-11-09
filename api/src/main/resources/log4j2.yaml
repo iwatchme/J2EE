@@ -1,0 +1,53 @@
+#共有8个级别，按照从低到高为：ALL<TRACE<DEBUG<INFO<WARN<ERROR<FATAL<OFF
+#status:用于log4j内部信息输出
+#monitorInterval:log4j检测配置文件的时间间隔，如果文件被修改，则重新加载
+Configuration:
+  status: warn
+  monitorInteval: 30
+
+  Properties:
+    property:
+      - name: log.path
+        value: target/logs
+      - name: project.name
+        value: demo
+      - name: log.pattern
+        value: "%d{yyyy-MM-dd HH:mm:ss.SSS} -%5p ${PID:-} [%15.15t]%-30.30C{1.}: %m%n"
+
+  Appenders:
+    Console:
+      name: STDOUT
+      target: SYSTEM_OUT
+      PatternLayout:
+        Pattern: ${log.pattern}"
+    RollingFile:
+      name: File
+      fileName: ${log.path}/${project.name}.log
+      PatternLayout:
+        Pattern: "${log.pattern}"
+      Filters:
+        ThresholdFilter:
+          - level: error
+            onMatch: ACCEPT
+            onDeny: DENY
+      Policies:
+        TimeBasedTriggerPolicy:
+          modulate: true
+          interval: 1
+      DefaultRolloverStrategy:
+        max: 100
+
+  Loggers:
+    Root:
+      level: debug
+      AppenderRef:
+        - ref: STDOUT
+
+    logger:
+      - name: org.apache.logging.log4j.test1
+        level: error
+        AppenderRef:
+          - ref: File
+
+
+          
